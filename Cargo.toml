@@ -1,0 +1,9 @@
+[package]
+name = "hanoi"
+version = "0.1.0"
+authors = ["Adrian Danis <rambobones@gmail.com>"]
+
+[dependencies]
+prototty = "0.17"
+prototty_unix = "0.17"
+prototty_common = "0.17" 
