@@ -1,3 +1,5 @@
+use std;
+
 pub type Stack = u32;
 pub type PieceHeight = u32;
 
@@ -16,8 +18,39 @@ pub struct PieceState {
 #[derive(Debug)]
 pub struct Piece {
     pub state: PieceState,
-    pub colour: Colour,
     pub num: u32,
+}
+
+impl Piece {
+    pub fn colour(&self) -> Colour {
+        match self.num % 2 {
+            0 => Colour::Black,
+            _ => Colour::White,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Error {
+    InvalidStack,
+}
+
+type GameResult<T> = Result<T, Error>;
+
+pub struct PiecesIter<'a> {
+    state_enum: std::iter::Enumerate<std::slice::Iter<'a, PieceState>>,
+}
+
+impl<'a> Iterator for PiecesIter<'a> {
+    type Item = Piece;
+    fn next(&mut self) -> Option<Piece> {
+        if let Some((num, state)) = self.state_enum.next() {
+            None
+//            Some(Piece{
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -27,13 +60,6 @@ pub struct GameState {
     num_stacks: u32,
     pieces: Vec<PieceState>,
 }
-
-#[derive(Debug, Clone, Copy)]
-pub enum Error {
-    InvalidStack,
-}
-
-type GameResult<T> = Result<T, Error>;
 
 impl GameState {
     pub fn new(start: Stack, num_stacks: u32, num_pieces: u32) -> GameResult<GameState> {
@@ -46,6 +72,9 @@ impl GameState {
         }
         Ok(GameState { start_stack: start, num_pieces: num_pieces, pieces: pieces, num_stacks: num_stacks })
     }
+    pub fn iter(&self) -> PiecesIter {
+        PiecesIter {state_enum: self.pieces.iter().enumerate() }
+    }
     // This should be an iterator
     pub fn num_pieces(&self) -> u32 {
         self.num_pieces
@@ -53,7 +82,6 @@ impl GameState {
     pub fn get_piece(&self, num: u32) -> Piece {
         Piece {
             state: self.pieces[num as usize],
-            colour: match num % 2 { 0 => Colour::Black, 1 => Colour::White, _ => unreachable!()},
             num: num,
         }
     }

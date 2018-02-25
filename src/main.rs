@@ -80,7 +80,7 @@ impl View<Game> for HanoiView {
                 }
             }
             RectangleView.view(&hanoi_rect(col_base + 2 + piece.num as i32, col_base + reserve - 2 - piece.num as i32, base_y, base_y + 1,
-                    match piece.colour { Colour::Black => colours::DARK_GREY, Colour::White => colours::YELLOW}
+                    match piece.colour() { Colour::Black => colours::DARK_GREY, Colour::White => colours::YELLOW}
                 ), offset, depth, grid);
         }
     }
