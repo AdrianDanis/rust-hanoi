@@ -28,14 +28,23 @@ pub struct GameState {
     pieces: Vec<PieceState>,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum Error {
+    InvalidStack,
+}
+
+type GameResult<T> = Result<T, Error>;
+
 impl GameState {
-    pub fn new(start: Stack, num_stacks: u32, num_pieces: u32) -> GameState {
-        // TODO: validate num_stacks, should return error type from this
+    pub fn new(start: Stack, num_stacks: u32, num_pieces: u32) -> GameResult<GameState> {
+        if start >= num_stacks {
+            return Err(Error::InvalidStack);
+        }
         let mut pieces = vec!();
         for i in 0..num_pieces {
             pieces.push(PieceState{stack: start, height: i})
         }
-        GameState { start_stack: start, num_pieces: num_pieces, pieces: pieces, num_stacks: num_stacks }
+        Ok(GameState { start_stack: start, num_pieces: num_pieces, pieces: pieces, num_stacks: num_stacks })
     }
     // This should be an iterator
     pub fn num_pieces(&self) -> u32 {

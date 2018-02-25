@@ -91,7 +91,7 @@ fn main() {
     let mut context = prototty_unix::Context::new().unwrap();
 
     let mut game = Game {
-        game: GameState::new(0, 3, 5),
+        game: GameState::new(0, 3, 5).unwrap(),
         interact: InteractState { hand_column: 0, grabbed: None },
     };
     context.render(&mut HanoiView, &game).unwrap();
