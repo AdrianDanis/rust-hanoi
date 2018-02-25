@@ -61,6 +61,9 @@ pub struct GameState {
 }
 
 impl GameState {
+    fn update_piece(&mut self, piece: u32, state: PieceState) {
+        self.pieces[piece as usize] = state;
+    }
     pub fn new(start: Stack, num_stacks: u32, num_pieces: u32) -> GameResult<GameState> {
         if start >= num_stacks {
             return Err(Error::InvalidStack);
@@ -112,16 +115,14 @@ impl GameState {
         } else if let Some(highest) = self.stack_top(to) {
             // check if we are smaller (i.e. have a larger num) than the destination
             if from_piece.num > highest.num {
-                self.pieces[from_piece.num as usize].stack = to;
-                self.pieces[from_piece.num as usize].height = highest.state.height + 1;
+                self.update_piece(from_piece.num, PieceState{stack: to, height: highest.state.height + 1});
                 Ok(true)
             } else {
                 Ok(false)
             }
         } else {
             // destination empty
-            self.pieces[from_piece.num as usize].stack = to;
-            self.pieces[from_piece.num as usize].height = 0;
+            self.update_piece(from_piece.num, PieceState{stack: to, height: 0});
             Ok(true)
         }
     }
