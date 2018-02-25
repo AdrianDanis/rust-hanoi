@@ -33,6 +33,7 @@ impl Piece {
 #[derive(Debug, Clone, Copy)]
 pub enum Error {
     InvalidStack,
+    ZeroPieces,
 }
 
 type GameResult<T> = Result<T, Error>;
@@ -67,6 +68,9 @@ impl GameState {
     pub fn new(start: Stack, num_stacks: u32, num_pieces: u32) -> GameResult<GameState> {
         if start >= num_stacks {
             return Err(Error::InvalidStack);
+        }
+        if num_pieces == 0 {
+            return Err(Error::ZeroPieces);
         }
         let mut pieces = vec!();
         for i in 0..num_pieces {
@@ -125,5 +129,9 @@ impl GameState {
             self.update_piece(from_piece.num, PieceState{stack: to, height: 0});
             Ok(true)
         }
+    }
+    pub fn complete(&self) -> bool {
+        let test_stack = self.pieces[0].stack;
+        test_stack != self.start_stack && self.pieces.iter().all(|&x| x.stack == test_stack)
     }
 }

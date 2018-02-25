@@ -91,7 +91,7 @@ fn main() {
     let mut context = prototty_unix::Context::new().unwrap();
 
     let mut game = Game {
-        game: GameState::new(0, 3, 5).unwrap(),
+        game: GameState::new(0, 3, 2).unwrap(),
         interact: InteractState { hand_column: 0, grabbed: None },
     };
     context.render(&mut HanoiView, &game).unwrap();
@@ -107,19 +107,23 @@ fn main() {
                 if game.interact.hand_column + 1 < game.game.num_stacks() {
                     game.interact.hand_column = game.interact.hand_column + 1;
                 },
-            Input::Char(' ') =>
-                match game.interact.grabbed {
-                    None =>
-                        game.interact.grabbed = match game.game.stack_top(game.interact.hand_column) {
-                            None => None,
-                            Some(_) => Some(game.interact.hand_column),
-                        },
-                    Some(col) =>
-                        game.interact.grabbed = match game.game.try_move(col, game.interact.hand_column) {
-                            Ok(true) => None,
-                            Ok(false) => Some(col),
-                            _ => panic!("error"),
-                        },
+            Input::Char(' ') => {
+                    match game.interact.grabbed {
+                        None =>
+                            game.interact.grabbed = match game.game.stack_top(game.interact.hand_column) {
+                                None => None,
+                                Some(_) => Some(game.interact.hand_column),
+                            },
+                        Some(col) =>
+                            game.interact.grabbed = match game.game.try_move(col, game.interact.hand_column) {
+                                Ok(true) => None,
+                                Ok(false) => Some(col),
+                                _ => panic!("error"),
+                            },
+                    };
+                    if game.game.complete() {
+                        done = true;
+                    }
                 },
             _ => done = true,
         }
