@@ -116,8 +116,9 @@ fn main() {
                         },
                     Some(col) =>
                         game.interact.grabbed = match game.game.try_move(col, game.interact.hand_column) {
-                            true => None,
-                            false => Some(col),
+                            Ok(true) => None,
+                            Ok(false) => Some(col),
+                            _ => panic!("error"),
                         },
                 },
             _ => done = true,

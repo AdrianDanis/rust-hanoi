@@ -100,33 +100,29 @@ impl GameState {
     pub fn valid_stack(&self, s: Stack) -> bool {
         s < self.num_stacks()
     }
-    pub fn try_move(&mut self, from: Stack, to: Stack) -> bool {
+    pub fn try_move(&mut self, from: Stack, to: Stack) -> GameResult<bool> {
         if !self.valid_stack(from) || !self.valid_stack(to) {
-            return false;
+            return Err(Error::InvalidStack);
         }
         // lookup the from piece
-        let from_piece;
-        match self.stack_top(from) {
-            None => return false, // muppet?
-            Some(piece) => from_piece = piece,
-        }
+        let from_piece = self.stack_top(from).ok_or(Error::InvalidStack)?;
         if from == to {
             // same stack, do nothing
-            true
+            Ok(true)
         } else if let Some(highest) = self.stack_top(to) {
             // check if we are smaller (i.e. have a larger num) than the destination
             if from_piece.num > highest.num {
                 self.pieces[from_piece.num as usize].stack = to;
                 self.pieces[from_piece.num as usize].height = highest.state.height + 1;
-                true
+                Ok(true)
             } else {
-                false
+                Ok(false)
             }
         } else {
             // destination empty
             self.pieces[from_piece.num as usize].stack = to;
             self.pieces[from_piece.num as usize].height = 0;
-            true
+            Ok(true)
         }
     }
 }
