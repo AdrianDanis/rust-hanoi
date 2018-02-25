@@ -15,7 +15,7 @@ pub struct PieceState {
     pub height: PieceHeight,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Piece {
     pub state: PieceState,
     pub num: u32,
@@ -88,17 +88,14 @@ impl GameState {
         self.num_stacks
     }
     pub fn stack_top(&self, stack: Stack) -> Option<Piece> {
-        let mut highest = None;
-        for piece in self.pieces_iter() {
-            if piece.state.stack == stack {
-                highest = match highest {
-                    None => Some(piece),
-                    Some(ref h) if piece.state.height > h.state.height => Some(piece),
-                    _ => highest
-                }
-            }
-        }
-        highest
+        self.pieces_iter()
+            // Only want items from the correct stack
+            .filter(|ref p| p.state.stack == stack)
+            // fold to find the highest one, or none
+            .fold(None, |highest, next| highest.map_or(Some(next),
+                    |h| if next.state.height > h.state.height { Some(next) } else { highest }
+                )
+            )
     }
     pub fn valid_stack(&self, s: Stack) -> bool {
         s < self.num_stacks()
