@@ -45,8 +45,7 @@ impl<'a> Iterator for PiecesIter<'a> {
     type Item = Piece;
     fn next(&mut self) -> Option<Piece> {
         if let Some((num, state)) = self.state_enum.next() {
-            None
-//            Some(Piece{
+            Some(Piece{state: *state, num:num as u32})
         } else {
             None
         }
@@ -72,7 +71,7 @@ impl GameState {
         }
         Ok(GameState { start_stack: start, num_pieces: num_pieces, pieces: pieces, num_stacks: num_stacks })
     }
-    pub fn iter(&self) -> PiecesIter {
+    pub fn pieces_iter(&self) -> PiecesIter {
         PiecesIter {state_enum: self.pieces.iter().enumerate() }
     }
     // This should be an iterator
@@ -90,11 +89,11 @@ impl GameState {
     }
     pub fn stack_top(&self, stack: Stack) -> Option<Piece> {
         let mut highest = None;
-        for (num, piece) in self.pieces.iter().enumerate() {
-            if piece.stack == stack {
+        for piece in self.pieces_iter() {
+            if piece.state.stack == stack {
                 highest = match highest {
-                    None => Some(self.get_piece(num as u32)),
-                    Some(ref h) if piece.height > h.state.height => Some(self.get_piece(num as u32)),
+                    None => Some(piece),
+                    Some(ref h) if piece.state.height > h.state.height => Some(piece),
                     _ => highest
                 }
             }
